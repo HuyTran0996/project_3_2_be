@@ -39,6 +39,7 @@ const getTaskById = catchAsync(async (req, res, next) => {
 const createTask = catchAsync(async (req, res, next) => {
   const newTask = await Task.create(req.body);
 
+  //update User collection
   const assignorIds = req.body.assignor;
   const assigneeIds = req.body.assignee;
 
@@ -52,6 +53,7 @@ const createTask = catchAsync(async (req, res, next) => {
       { $push: { task: newTask._id } }
     ),
   ]);
+  ////
 
   res.status(201).json({
     message: "Create Task Successfully!",
@@ -69,19 +71,21 @@ const editTask = catchAsync(async (req, res, next) => {
     return next(new AppError("No task found with that ID", 404));
   }
 
-  const assignorIds = req.body.assignor;
-  const assigneeIds = req.body.assignee;
+  //update User collection
+  const assignorIds = task.assignor;
+  const assigneeIds = task.assignee;
 
   await Promise.all([
     User.updateMany(
       { _id: { $in: assignorIds } },
-      { $push: { task: newTask._id } }
+      { $push: { task: task._id } }
     ),
     User.updateMany(
       { _id: { $in: assigneeIds } },
-      { $push: { task: newTask._id } }
+      { $push: { task: task._id } }
     ),
   ]);
+  ///////////
 
   res.status(200).json({
     message: "Update Task Successfully!",
@@ -94,10 +98,12 @@ const deleteTask = catchAsync(async (req, res, next) => {
   if (!task) {
     return next(new AppError("No task found with that ID", 404));
   }
-
+  //update User collection
   await Promise.all([
     User.updateMany({ task: task._id }, { $pull: { task: task._id } }),
   ]);
+  //{ $pull: { task: task._id } }: This is the update operation. $pull is a MongoDB operator that removes all instances of a value from an existing array. In this case, it's removing the _id of the task that's being deleted from the task array of the users who had that task assigned to them.
+
   res.status(204).json({
     message: "Delete Task Successfully!",
     data: null,

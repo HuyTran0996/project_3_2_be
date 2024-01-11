@@ -39,6 +39,17 @@ const getUserById = catchAsync(async (req, res, next) => {
 const createUser = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
 
+  //update Task collection
+  const taskIds = req.body.task;
+  const role = req.body.role;
+  await Promise.all([
+    Task.updateMany(
+      { _id: { $in: taskIds } },
+      { $push: { [`${role}`]: newUser._id } }
+    ),
+  ]);
+  ///
+
   res.status(201).json({
     message: "Create User Successfully!",
     user: newUser,
@@ -55,6 +66,17 @@ const editUser = catchAsync(async (req, res, next) => {
     return next(new AppError("No user found with that ID", 404));
   }
 
+  //update Task collection
+
+  const role = user.role;
+  await Promise.all([
+    Task.updateMany(
+      { _id: { $in: taskIds } },
+      { $push: { [`${role}`]: user._id } }
+    ),
+  ]);
+  ////
+
   res.status(200).json({
     message: "Update User Successfully!",
     user,
@@ -66,6 +88,13 @@ const deleteUser = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError("No user found with that ID", 404));
   }
+
+  //update Task collection
+  await Promise.all([
+    Task.updateMany({ role: user._id }, { $pull: { role: user._id } }),
+  ]);
+  /////
+
   res.status(204).json({
     message: "Delete User Successfully!",
     data: null,
