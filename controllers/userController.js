@@ -5,7 +5,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
 const getUsers = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(User.find(), req.query).paginate();
+  const features = new APIFeatures(User.find(), req.query).filter().paginate();
   const users = await features.query;
   const totalUsers = await User.find();
   const totalPages = Math.ceil(totalUsers.length / 10);

@@ -8,7 +8,10 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["manager", "employee"],
+    enum: {
+      values: ["manager", "employee"],
+      message: 'role is either: "manager", "employee"',
+    },
     required: [true, "A user must have a role"],
     default: "employee",
   },

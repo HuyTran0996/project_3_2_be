@@ -5,7 +5,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
 const getTasks = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(Task.find(), req.query).paginate();
+  const features = new APIFeatures(Task.find(), req.query).filter().paginate();
   const tasks = await features.query;
   const totalTasks = await Task.find();
   const totalPages = Math.ceil(totalTasks.length / 10);
@@ -94,10 +94,14 @@ const editTask = catchAsync(async (req, res, next) => {
 });
 
 const deleteTask = catchAsync(async (req, res, next) => {
-  const task = await Task.findByIdAndDelete(req.params.id);
+  // const task = await Task.findByIdAndDelete(req.params.id);
+  const task = await Task.findById(req.params.id);
   if (!task) {
     return next(new AppError("No task found with that ID", 404));
   }
+  task.isDeleted = true;
+  task.deletedAt = Date.now();
+  await task.save();
   //update User collection
   await Promise.all([
     User.updateMany({ task: task._id }, { $pull: { task: task._id } }),
