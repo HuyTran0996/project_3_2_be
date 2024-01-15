@@ -12,6 +12,6 @@ router
   .route("/:id")
   .get(taskControllers.getTaskById)
   .put(taskControllers.editTask)
-  .delete(taskControllers.deleteTask); //soft delete
+  .delete(taskControllers.deleteTask);
 
 module.exports = router;
