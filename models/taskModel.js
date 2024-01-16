@@ -9,7 +9,7 @@ const taskSchema = new mongoose.Schema({
     // To solve this, you could use a custom setter for the name field in your schema. A setter is a function that Mongoose calls whenever you set the value of a path. A setter function runs before type casting. So when you use a setter, Mongoose first calls the setter function with the raw incoming value. If the setter throws an error, Mongoose stops further processing and doesn't save the document.
     set: function (v) {
       if (typeof v !== "string") {
-        throw new Error("Name must be a string");
+        throw new Error("Name must be a string (schema)");
       }
       return v;
     },

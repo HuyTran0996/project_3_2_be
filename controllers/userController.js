@@ -95,7 +95,7 @@ const deleteUser = catchAsync(async (req, res, next) => {
   ]);
   /////
 
-  res.status(204).json({
+  res.status(202).json({
     message: "Delete User Successfully!",
     data: null,
   });
